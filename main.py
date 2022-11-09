@@ -6,11 +6,15 @@ import json
 from waitress import serve
 import pymongo
 import certifi
+
+from controladores.controlador_mesa import controlador_mesa
 from controladores.controladorcuidadano import controladorcuidadano
 
 app=Flask(__name__)
 cors = CORS(app)
 micontroladorcuidadano=controladorcuidadano()
+micontroladormesa=controlador_mesa()
+
 
 ca = certifi.where()
 client = pymongo.MongoClient("mongodb://juanda:juanda@ac-gceqpva-shard-00-00.ajz9qon.mongodb.net:27017,ac-gceqpva-shard-00-01.ajz9qon.mongodb.net:27017,ac-gceqpva-shard-00-02.ajz9qon.mongodb.net:27017/registraduria?ssl=true&replicaSet=atlas-lr7lii-shard-0&authSource=admin&retryWrites=true&w=majority")
@@ -56,6 +60,38 @@ def loadFileConfig():
     with open('config.json') as f:
         data = json.load(f)
     return data
+
+
+#########CRUD MESA#########
+
+####GET###
+@app.route("/mesa",methods=['GET'])
+def getmesa():
+    json=micontroladormesa.index()
+    return jsonify(json)
+
+###POST###
+@app.route("/mesa",methods=['POST'])
+def crearmesa():
+    data = request.get_json()
+    json=micontroladormesa.create(data)
+    return jsonify(json)
+
+###PUT###
+@app.route("/mesa/<string:id>",methods=['PUT'])
+def modificarmesa(id):
+    data = request.get_json()
+    json=micontroladormesa.update(id,data)
+    return jsonify(json)
+
+###DELETE###
+@app.route("/mesa/<string:id>",methods=['DELETE'])
+def eliminarmesa(id):
+    json=micontroladormesa.delete(id)
+    return jsonify(json)
+####FIN CRUD MESA###
+
+
 
 if __name__=='__main__':
     dataConfig = loadFileConfig()
